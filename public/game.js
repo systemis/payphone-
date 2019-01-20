@@ -31,8 +31,6 @@ function preload() {
 }
 
 function create() {
-  console.log(game.stage);
-
   this.add.image(400, 300, 'sky');
 
   cursors = this.input.keyboard.createCursorKeys();
