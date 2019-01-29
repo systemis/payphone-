@@ -59,6 +59,8 @@ function create() {
 
   this.add.text(500, 20, 'Speed', textStyle_Key);
   speedTextValue = this.add.text(558, 10, speed.toString(), textStyle_Value);
+
+  this.physics.add.collider(snake, game);
 }
 
 function update() {
@@ -77,6 +79,37 @@ function update() {
 
   updateDelay++;
 
+  var firstCell = snake[snake.length - 1];
+  var lastCell = snake.shift();
+  var oldLastCellx = lastCell.x;
+  var oldLastCally = lastCell.y;
+
+  if (new_direction) {
+    direction = new_direction;
+    new_direction = null;
+  }
+
+  if (direction == 'right') {
+    lastCell.x = firstCell.x + 5;
+    lastCell.y = firstCell.y;
+  }
+  else if (direction == 'left') {
+    lastCell.x = firstCell.x - 5;
+    lastCell.y = firstCell.y;
+  }
+  else if (direction == 'up') {
+    lastCell.x = firstCell.x;
+    lastCell.y = firstCell.y - 5;
+  }
+  else if (direction == 'down') {
+    lastCell.x = firstCell.x;
+    lastCell.y = firstCell.y + 5;
+  }
+
+  // Place the last cell in the front of the stack.
+  // Mark it the first cell.
+
+  snake.push(lastCell);
 }
 
 function generateApple() {

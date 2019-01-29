@@ -21,7 +21,6 @@ var config = {
 var game = new Phaser.Game(config);
 
 function preload() {
-  console.log(game.stage);
   game.stage.backgroundColor = '#eee';
 }
 
