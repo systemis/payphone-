@@ -22,6 +22,7 @@ gameScene.preload = function () {
 
 // executed once, after assets were loaded
 gameScene.create = function () {
+  this.cursors = this.input.keyboard.createCursorKeys();
   this.background = this.add.sprite(0, 0, 'background');
   this.player = this.add.sprite(40, this.sys.game.config.height / 2, 'player');
 
@@ -48,15 +49,66 @@ gameScene.create = function () {
 
 // executed on every frame (60 times per second)
 gameScene.update = function () {
+  if (!this.isPlayerAlive) {
+    return false;
+  }
 
+  if (this.cursors.up.isDown) {
+    this.player.x += this.playerSpeed;
+  }
 
+  let enemies = this.enemies.getChildren();
+  for (let i = 0; i < enemies.length; i++) {
+    let component = enemies[i];
+    enemies[i].y += enemies[i].speed;
+    if (component.y >= this.enemyMaxY && component.speed > 0) {
+      enemies[i].speed *= -1;
+    } else if (component.y <= this.enemyMinY && component.speed < 0) {
+      enemies[i].speed *= -1;
+    }
+
+    this.overlap(this.player.getBounds(), component.getBounds(), () => {
+      // flag to set player is dead
+      this.isPlayerAlive = false;
+
+      // shake the camera
+      this.cameras.main.shake(500);
+
+      // fade camera
+      this.time.delayedCall(250, function () {
+        this.cameras.main.fade(250);
+      }, [], this);
+
+      // restart game
+      this.time.delayedCall(500, function () {
+        this.scene.restart();
+      }, [], this);
+    })
+  }
+
+  this.overlap(this.player.getBounds(), this.treasure.getBounds(), () => {
+    this.gameOver();
+  })
 };
+
+gameScene.overlap = function (bound1, bound2, callback) {
+  if (Phaser.Geom.Intersects.RectangleToRectangle(bound1, bound2)) {
+    callback();
+  }
+}
+
+gameScene.gameOver = function () {
+  this.isPlayerAlive = false;
+  this.cameras.main.shake(500);
+
+  console.log('Game over');
+}
 
 let config = {
   type: Phaser.AUTO,
   width: 640,
   height: 360,
-  scene: gameScene
+  scene: gameScene,
 };
 
 let game = new Phaser.Game(config);
